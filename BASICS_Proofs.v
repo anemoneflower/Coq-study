@@ -112,7 +112,116 @@ Proof.
   (* The annotation "as [| n']" is called an intro pattern. It tells Coq what variable names to introduce in each subgoal. In general, what goes between the square brackets is a list of lists of names, separated by |. In this case, the first component is empty, since the O constructor is nullary (it doesn't have any arguments). The second component gives a single name, n', since S is a unary constructor. *)
   (* The eqn:E annotation tells destruct to give the name E to this equation. *)
   intros n. destruct n as [| n'] eqn: E.
+  (*The - signs are called bullets, and they mark the parts of the proof that correspond to each generated subgoal. *)
   - reflexivity.
   - reflexivity.
 Qed.
+
+Theorem negb_involutive: forall b: bool,
+  negb (negb b) = b.
+Proof.
+  intros b. destruct b eqn:E.
+  -reflexivity.
+  -reflexivity. Qed.
+
+(* It is sometimes useful to invoke destruct inside  a subgoal. In this case, we use different kinds of bullets to mark goals on different "levels" *)
+
+(*def. from previous file *)
+Definition andb (b1:bool) (b2:bool) : bool :=
+  match b1 with
+  | true => b2
+  | false => false
+  end.
+
+Theorem andb_commutative : forall b c, andb b c = andb c b.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  - destruct c eqn:Ec.
+    + reflexivity.
+    + reflexivity.
+  - destruct c eqn:Ec.
+    + reflexivity.
+    + reflexivity.
+  Qed.
+
+(* We can also use * or curly braces *)
+Theorem andb_commutative' : forall b c, andb b c = andb c b.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  { destruct c eqn:Ec.
+    { reflexivity. }
+    { reflexivity. }}
+  { destruct c eqn:Ec.
+    { reflexivity. }
+    { reflexivity. }}
+  Qed.
+
+(* curly braces allow us to reuse the same bullet shapes at multiple levels in a proof *)
+Theorem andb3_exchange :
+  forall b c d, andb (andb b c) d = andb (andb b d) c.
+Proof.
+  intros b c d. destruct b eqn:Eb.
+  - destruct c eqn:Ec.
+    { destruct d eqn:Ed.
+      - reflexivity.
+      - reflexivity. }
+    { destruct d eqn:Ed.
+      - reflexivity.
+      - reflexivity. }
+  - destruct c eqn:Ec.
+    { destruct d eqn:Ed.
+      - reflexivity.
+      - reflexivity. }
+    { destruct d eqn:Ed.
+      - reflexivity.
+      - reflexivity. }
+Qed.
+
+Theorem plus_1_neq_0' : forall n : nat,
+  (n + 1) =? 0 = false.
+Proof.
+  intros [|n].
+  - reflexivity.
+  - reflexivity. Qed.
+
+Theorem andb_commutative'' :
+  forall b c, andb b c = andb c b.
+Proof.
+  intros [] [].
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+(* Ex> andb true elim2 *)
+Theorem andb_true_elim2 : forall b c : bool,
+  andb b c = true -> c = true.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  - simpl. destruct c eqn:Ec.
+    + simpl. reflexivity.
+    + intros H. rewrite -> H. reflexivity.
+  - simpl. destruct c eqn:Ec.
+    + reflexivity.
+    + intros H. rewrite -> H. reflexivity.  
+  Qed.
+
+(* Ex> zero nbeq plus 1 *)
+Theorem zero_nbeq_plus_1 : forall n : nat,
+  O =? (n+1) = false.
+Proof.
+  intros [|n].
+  - reflexivity.
+  - reflexivity.
+  Qed.
+
+
+
+
+
+
+
+
+
 
